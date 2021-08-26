@@ -4,6 +4,8 @@ Coeus is a system for oblivious document ranking and retrieval. From high level,
 
 ## Setup
 
+### AWS
+
 (Estimated time: 10 minutes)
 
 We have installed the environment required for running Coeus in an AWS AMI and made it public. Following are the details of the publicly available AMI:
@@ -14,9 +16,23 @@ We have installed the environment required for running Coeus in an AWS AMI and m
     AMI ID: ami-004d83515c02322aa
     Source: 235748323098/Coeus_artifact
 
-Launch an AWS instance with this AMI. An instance with bigger memory is preferred, since the experiments are memory hungry (We used <code>c5.12xlarge</code> for our experiments, which has a memory of 96GB). Then, clone this repository:
+Launch an AWS instance with this AMI. An instance with bigger memory is preferred, since the experiments are memory hungry (We used <code>c5.12xlarge</code> for our experiments, which has a memory of 96GB). 
+
+Then, clone this repository:
 
     git clone https://github.com/ishtiyaque/Coeus_artifact
+
+### Local (Tested on Ubuntu 18.04)
+
+(Estimated time: 30 minutes)
+
+First, clone this repository:
+
+    git clone https://github.com/ishtiyaque/Coeus_artifact
+    
+Run the following command in the cloned directory:
+
+    ./env_setup.sh
   
 ## Build
 
@@ -40,14 +56,16 @@ Each executable can be run by passing two arguments: number of row blocks and co
     
 This will output the total time required as well as a breakdown of that time.
 
-To reproduce the experiments in Figure 8 of the paper, run the following command:
+The script <code>run.sh</code> can be used to run all the executables for different number of vertically stacked column blocks, as shown in Figure 8. <code>run.sh</code> takes an argument <code>max_blocks</code> and runs each executable from 1 to <code>max_blocks</code> number of column blocks with a geometric progression of 2.
 
-    bash ./run.sh
+For example, to reproduce the exact experiments in Figure 8 of the paper, run the following command:
+
+    bash ./run.sh 64
  
-This may take a few hours depending on the configuration of the machine used. After finishing, the results will be available in some text files in the <code>results</code> directory. Please note that, experiments with higher number of blocks may fail if sufficient memory is not available.
+This may take a few hours depending on the configuration of the machine used. After finishing, the results will be available in some text files in the <code>results</code> directory. Please note that, experiments with higher number of blocks may fail if sufficient memory is not available. Considering a smaller value for <code>max_blocks</code> may be a way around for that.
 
 Finally, figure 8 can be reproduced by the follwoing command:
 
-    python3 gen_graph.py
+    python3 gen_graph.py <max_blocks>
     
 The figure will be available in the <code>results</code> directory as <code>matmult.png</code>.
