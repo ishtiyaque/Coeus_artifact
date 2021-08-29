@@ -33,8 +33,10 @@ First, clone this repository:
 Run the following command in the cloned directory:
 
     ./env_setup.sh
-  
-## Build
+
+## Matrix-vector product in a single machine
+
+### Build
 
 (Estimated time: 5 minutes)
 
@@ -46,7 +48,7 @@ Run the following commands in the cloned directory:
     
 This will generate three executable files in the <code>matmut/bin</code> directory, namely, <code>baseline</code>, <code>opt1</code>, and <code>opt2</code> corresponding to the Halevi Shoup baseline algorithm, Coeus with only the first optimization, and Coeus with both the first and second optimizations as discussed in the paper.
 
-## Run
+### Run
 
 (Estimated time: 4 hours)
 
@@ -68,4 +70,4 @@ Finally, figure 8 can be reproduced by the follwoing command:
 
     python3 gen_graph.py <max_blocks>
     
-The figure will be available in the <code>results</code> directory as <code>matmult.png</code>.
+The figure will be available in a file named <code>single-machine-matrix-vector.pdf</code> in the <code>matmult</code> directory.
