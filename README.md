@@ -117,7 +117,7 @@ Run client
     
 Run each worker:
 
-    python run_worker.py -n <num_docs> -b <submatrix_width> -p <master_ip> -f <num_features> -c <client_ip> -w <num_workers> -t <num_thread_per_worker> -i <worker_id>
+    python run_worker.py -n <num_docs> -b <log2(submatrix_width)> -p <master_ip> -f <num_features> -c <client_ip> -w <num_workers> -t <num_thread_per_worker> -i <worker_id>
     
 The options are explained below:
 
