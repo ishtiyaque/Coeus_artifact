@@ -34,7 +34,7 @@ Run the following command in the cloned directory:
 
     ./env_setup.sh
 
-## Matrix-vector product in a single machine
+## Matrix-vector product in a single machine (Figure 8)
 
 ### Build
 
@@ -72,26 +72,26 @@ Finally, figure 8 can be reproduced by the follwoing command:
     
 The figure will be available in a file named <code>single-machine-matrix-vector.pdf</code> in the <code>matmult</code> directory.
 
-## Matrix-vector product over a cluster of machines
+## Matrix-vector product over a cluster of machines (Figure 9)
 
 Coeus follows a master-worker architecture to support large-scale matrix vector product. The master receives the query and necessary keys from the client and distributes the computation task among a set of worker machines. In this part, we will describe how to perform this distributed matrix-vector product computation and regenerate the graph in Figure 9. The experiments involve three types of processes: a client process, a master process, and a number of worker processes. Ideally, each process should run on a separate machine. However, it is possible to run multiple processes on the same machine, the results might not look as expected in that case though.
 
 ### Build
-First, clone this repo in each of the client, master, and worker machines.
+First, clone this repo in each of the client, master, and worker machines. Then, build the relevant part in each machine.
 
-To compile master code, run:
+To build master code, run:
 
     cd step1/server/master
     cmake .
     make
 
-To compile worker code, run:
+To build worker code, run:
 
     cd step1/server/worker
     cmake .
     make
     
-To compile client code, run:
+To build client code, run:
 
     cd step1/client
     cmake .
