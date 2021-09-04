@@ -419,3 +419,10 @@ The options are explained below:
 The experiment needs to be repeated for different document library sizes. Each process will produce output files in its <code>result/</code> subdirectory.
 
 ### Generate graphs (Figure 6 and 7)
+
+Copy all the output files from <code>step1/client/result/</code>, <code>step2/client/result/</code>, and <code>step3/client/result/</code> into <code>graphs/latency-vs-rounds/raw/</code>. Then run a graph generator python script passing the three different document library sizes used in the experiments.
+
+    cd graphs/latency-vs-rounds
+    python gen_graph.py <doc_size1> <doc_size2> <doc_size3>
+
+A graph similar to Figure 6 will be available in a file named <code>latency-vs-rounds.pdf</code>
