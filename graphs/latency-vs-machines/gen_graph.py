@@ -46,5 +46,5 @@ dat_file.close()
 cmd = "bash latency-vs-machines.sh "
 #print(cmd)
 os.system(cmd)
-os.system("rm -f multi-machine-matrix-vector.dat")
+os.system("rm -f latency-vs-machines.dat")
 os.system("rm -f plot.plt")
