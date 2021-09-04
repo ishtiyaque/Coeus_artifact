@@ -425,4 +425,4 @@ Copy all the output files from <code>step1/client/result/</code>, <code>step2/cl
     cd graphs/latency-vs-rounds
     python gen_graph.py <doc_size1> <doc_size2> <doc_size3>
 
-A graph similar to Figure 6 will be available in a file named <code>latency-vs-rounds.pdf</code>
+A graph similar to Figure 6 will be available in a file named <code>latency-vs-rounds.pdf</code>. Client cost summary as in Figure 7 will be available in <code>client_cost.txt</code>
