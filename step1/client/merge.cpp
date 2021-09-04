@@ -17,7 +17,8 @@ pthread_mutex_t warmup_lock = PTHREAD_MUTEX_INITIALIZER;
 pthread_cond_t warmup_cond = PTHREAD_COND_INITIALIZER;
 
 uint64_t query_gen_time = 0;
-
+uint64_t gal_key_size =0, query_size=0;
+uint64_t total_download = 0;
 clock_t total_cpu_start_time, total_cpu_stop_time;
 
 int warmup_count = 0;
@@ -147,7 +148,7 @@ int main(int argc, char **argv)
 
     time_start = chrono::high_resolution_clock::now();
 
-    int sz = gal_keys.save(gkss, compr_mode_type::deflate);
+    gal_key_size  = gal_keys.save(gkss, compr_mode_type::deflate);
     time_end = chrono::high_resolution_clock::now();
     auto ser_time = chrono::duration_cast<chrono::microseconds>(time_end - time_start).count();
     cout << "serialize time" << endl
@@ -209,7 +210,7 @@ int main(int argc, char **argv)
     {
         Serializable<Ciphertext> sct = encryptor.encrypt_symmetric(query_pt);
         stringstream querystream;
-        sct.save(querystream);
+        query_size += sct.save(querystream);
         serialized_query.push_back(querystream.str());
     }
     time_end = chrono::high_resolution_clock::now();
@@ -254,6 +255,7 @@ void sendResponse(int start, int end, vector<vector<uint64_t>> ct)
     for (int i = start; i < end; i++)
     {
         assert(ct[i - start].size() == (N * 2 * 2));
+        total_download += (N*2*2*8);
         std::copy(ct[i - start].begin(), ct[i - start].end(), final_result[i].data());
     }
     pthread_mutex_lock(&response_lock);
@@ -276,7 +278,11 @@ void printReport()
     {
         cout << response_rcv_timestamp[i] <<"\t";
     }
-    cout<<"\nTotal CPU time (sec) "<<endl<<((float)total_cpu_stop_time-total_cpu_start_time)/CLOCKS_PER_SEC;
+    cout<<"\nTotal CPU time (sec) "<<endl<<((float)total_cpu_stop_time-total_cpu_start_time)/CLOCKS_PER_SEC<<endl;
+    cout<<"Galois key size "<<endl<<gal_key_size<<endl;
+    cout<<"Query size "<<endl<<query_size<<endl;
+    cout<<"Total download "<<endl<<total_download;
+
 
     return;
 }

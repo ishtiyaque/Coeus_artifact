@@ -20,6 +20,7 @@ pthread_cond_t warmup_cond = PTHREAD_COND_INITIALIZER;
 
 uint64_t query_gen_time, topk_time, latency;
 uint64_t gal_key_size =0, query_size=0;
+uint64_t total_download = 0;
 clock_t total_cpu_start_time, total_cpu_stop_time;
 
 
@@ -279,6 +280,7 @@ void sendResponse(int start, int end, vector<vector<uint64_t>> ct)
     for (int i = start; i < end; i++)
     {
         assert(ct[i - start].size() == (N * 2 * 2));
+        total_download += (N*2*2*8);
         //std::copy(ct[i - start].begin(), ct[i - start].end(), final_result[i].data());
         std::copy(ct[i - start].begin(), ct[i - start].end(), temp_ct->data());
 
@@ -319,6 +321,7 @@ void printReport()
     cout<<"top k time: "<<endl<<topk_time<<endl;
     cout<<"Galois key size "<<endl<<gal_key_size<<endl;
     cout<<"Query size "<<endl<<query_size<<endl;
+    cout<<"Total download "<<endl<<total_download;
 
     return;
 }
