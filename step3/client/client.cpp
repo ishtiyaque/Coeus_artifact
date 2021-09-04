@@ -13,6 +13,7 @@ int warmup_count = 0;
 int response_received = 0;
 
 uint64_t query_gen_time, latency, decode_time;
+uint64_t total_upload = 0, total_download = 0;
 
 uint64_t query_send_timestamp;
 vector<uint64_t> response_rcv_timestamp;
@@ -133,6 +134,8 @@ int main(int argc, char *argv[]) {
     uint64_t offset = client.get_fv_offset(ele_index, ITEM_SIZE); // offset in FV plaintext
     PirQuery query = client.generate_query(index);
     std::string serialized_query = serialize_query(query);
+
+    total_upload = serialized_gal_key.size() + serialized_query.size();
   
     time_end = chrono::high_resolution_clock::now();
     query_gen_time = chrono::duration_cast<chrono::microseconds>(time_end - time_start).count();
@@ -186,6 +189,7 @@ void sendResponse(int id,string response)
     //all_replies.push_back(reply);
 
     pthread_mutex_lock(&response_lock);
+    total_download += response.size();
     response_received ++;
     if (response_received == NUM_TOTAL_WORKER)
     {
@@ -209,5 +213,8 @@ void printReport()
     cout<<"\nTotal CPU time (sec): "<<endl<<(((float)total_cpu_stop_time-total_cpu_start_time)/CLOCKS_PER_SEC)<<endl;
     cout<<"query gen time "<<endl<<query_gen_time<<endl;
     cout<<"decode time "<<endl<<decode_time<<endl;
+    cout<<"Total upload "<<total_upload<<endl;
+    cout<<"Total download "<<total_download;
+
     return;
 }

@@ -255,10 +255,10 @@ void sendResponse(int start, int end, vector<vector<uint64_t>> ct)
     for (int i = start; i < end; i++)
     {
         assert(ct[i - start].size() == (N * 2 * 2));
-        total_download += (N*2*2*8);
         std::copy(ct[i - start].begin(), ct[i - start].end(), final_result[i].data());
     }
     pthread_mutex_lock(&response_lock);
+    total_download += (N*2*2*8*(end - start));
     response_received += (end - start);
     if (response_received == RESPONSE_CT)
     {

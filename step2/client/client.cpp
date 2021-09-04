@@ -17,6 +17,7 @@ int k = 0; // k in top k
 
 int warmup_count = 0;
 int response_received = 0;
+uint64_t total_upload = 0, total_download = 0;
 
 uint64_t query_gen_time, latency, decode_time;
 
@@ -189,6 +190,10 @@ int main(int argc, char *argv[]) {
         serialized_query.push_back(serialize_query(query));    
     }
 
+    total_upload += serialized_gal_key.size();
+    for(int i = 0; i < serialized_query.size();i++) {
+        total_upload += serialized_query[i].size();
+    }
  
     time_end = chrono::high_resolution_clock::now();
     query_gen_time = chrono::duration_cast<chrono::microseconds>(time_end - time_start).count();
@@ -205,14 +210,6 @@ int main(int argc, char *argv[]) {
     total_cpu_stop_time = clock();
 
     latency = chrono::duration_cast<chrono::microseconds>(time_end - time_start).count();
-
-    // time_start = chrono::high_resolution_clock::now();
-    // for(int i = 0; i < NUM_TOTAL_WORKER;i++) {
-    //     Plaintext result = client->decode_reply(all_replies[i]);
-    // }
-    // time_end = chrono::high_resolution_clock::now();
-    // decode_time= chrono::duration_cast<chrono::microseconds>(time_end - time_start).count();
- 
 
     printReport();
     return 0;
@@ -244,6 +241,8 @@ void sendResponse(int id,string response)
     //all_replies.push_back(reply);
 
     pthread_mutex_lock(&response_lock);
+    total_download += response.size();
+
     response_received ++;
     if (response_received == NUM_TOTAL_WORKER)
     {
@@ -266,6 +265,8 @@ void printReport()
     }
     cout<<"\nTotal CPU time (sec): "<<endl<<(((float)total_cpu_stop_time-total_cpu_start_time)/CLOCKS_PER_SEC)<<endl;
     cout<<"query gen time "<<endl<<query_gen_time<<endl;
+    cout<<"Total upload "<<total_upload<<endl;
+    cout<<"Total download "<<total_download;
     //cout<<"decode time "<<endl<<decode_time<<endl;
     return;
 }
