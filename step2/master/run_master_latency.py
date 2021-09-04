@@ -7,7 +7,7 @@ def main(argv):
 	try:
 		opts, args = getopt.getopt(argv,"n:p:")
 	except getopt.GetoptError:
-		print("run_master_latency.py -p <master_ip> -n num_docs")
+		print("run_master_latency.py -p <master_ip> -n <num_docs>")
 		sys.exit(2)
 	for opt, arg in opts:
 		if opt == '-p':
