@@ -25,4 +25,14 @@ cmake . -DBUILD_SHARED_LIBS=ON -DCMAKE_VERBOSE_MAKEFILE=ON -DCMAKE_C_COMPILER=cl
 make
 sudo make install
 popd
+
+pushd SEAL
+git checkout 3.2.0
+git pull
+cd native/src
+cmake . -DBUILD_SHARED_LIBS=ON -DCMAKE_VERBOSE_MAKEFILE=ON -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++
+make
+sudo make install
+popd
+
 popd
