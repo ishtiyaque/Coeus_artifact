@@ -16,7 +16,7 @@ def main(argv):
 	try:
 		opts, args = getopt.getopt(argv,"n:p:f:c:w:")
 	except getopt.GetoptError:
-		print("run_master.py -n <num_docs> -p <master_ip> -f <num_features> -c <client_ip> -w <num_workers>")
+		print("run_master_latency.py -n <num_docs> -p <master_ip> -f <num_features> -c <client_ip> -w <num_workers>")
 		sys.exit(2)
 	for opt, arg in opts:
 		if opt == '-n':

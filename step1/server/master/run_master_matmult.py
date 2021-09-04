@@ -14,7 +14,7 @@ def main(argv):
 	try:
 		opts, args = getopt.getopt(argv,"n:b:p:f:c:w:")
 	except getopt.GetoptError:
-		print("run_master.py -n <num_docs> -b <log2(submatrix_width)> -p <master_ip> -f <num_features> -c <client_ip> -w <num_workers>")
+		print("run_master_matmult.py -n <num_docs> -b <log2(submatrix_width)> -p <master_ip> -f <num_features> -c <client_ip> -w <num_workers>")
 		sys.exit(2)
 	for opt, arg in opts:
 		if opt == '-n':

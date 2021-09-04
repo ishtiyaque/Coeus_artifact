@@ -8,7 +8,7 @@ def main(argv):
 	try:
 		opts, args = getopt.getopt(argv,"n:p:c:")
 	except getopt.GetoptError:
-		print("run_client.py -n <num_docs> -p <master_ip>  -c <client_ip> ")
+		print("run_client_latency.py -n <num_docs> -p <master_ip>  -c <client_ip> ")
 		sys.exit(2)
 	for opt, arg in opts:
 		if opt == '-n':

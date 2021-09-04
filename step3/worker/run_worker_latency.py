@@ -9,7 +9,7 @@ def main(argv):
 	try:
 		opts, args = getopt.getopt(argv,"n:c:i:")
 	except getopt.GetoptError:
-		print("run_worker.py -n <num_docs> -c <client_ip>  -i <worker_id>")
+		print("run_worker_latency.py -n <num_docs> -c <client_ip>  -i <worker_id>")
 		sys.exit(2)
 	for opt, arg in opts:
 		if opt == '-n':
