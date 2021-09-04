@@ -109,15 +109,15 @@ Then, in the master and worker machines, open the file <code>step1/common/worker
 
 Run master:
 
-    python run_master.py -n <num_docs> -b <log2(submatrix_width)> -p <master_ip> -f <num_features> -c <client_ip> -w <num_workers>
+    python run_master_matmult.py -n <num_docs> -b <log2(submatrix_width)> -p <master_ip> -f <num_features> -c <client_ip> -w <num_workers>
     
 Run client
 
-    python run_client.py -n <num_docs> -b <log2(submatrix_width)> -p <master_ip> -f <num_features> -c <client_ip> -w <num_workers>
+    python run_client_matmult.py -n <num_docs> -b <log2(submatrix_width)> -p <master_ip> -f <num_features> -c <client_ip> -w <num_workers>
     
 Run each worker:
 
-    python run_worker.py -n <num_docs> -b <log2(submatrix_width)> -p <master_ip> -f <num_features> -c <client_ip> -w <num_workers> -t <num_thread_per_worker> -i <worker_id>
+    python run_worker_matmult.py -n <num_docs> -b <log2(submatrix_width)> -p <master_ip> -f <num_features> -c <client_ip> -w <num_workers> -t <num_thread_per_worker> -i <worker_id>
     
 The options are explained below:
 
@@ -143,32 +143,46 @@ To generate a graph like Figure 9, run:
 
 The graph will be available in a file named <code>multi-machine-matrix-vector.pdf</code>
 
-## Comparison of query scoring step in Coeus
+## Comparison of query scoring step in Coeus (Figure 5)
 
-The query scoring step in Coeus is essentially a large scale matrix-vector product. In the paper, Figure 5 shows a comparison of this step with an unoptimised baseline. The latency numbers for different number of documents using a varied number of worker machines can be obtained following the steps discussed in the previsous section. Line 4 in the client output file denoted the latency in microseconds.
-
-To run the same experiments with an unoptimized baseline, a similar master, worker, client environment needs to be set up.
+The query scoring step in Coeus is essentially a large scale matrix-vector product. In the paper, Figure 5 shows a comparison of this step with an unoptimised baseline. To reproduce the results, first determine three different numbers of documents (as in Fig. 5). Then both Coeus' optimized protocol and the unoptimized baseline should be run for all three document library sizes, with a fixed number of features. A similar master, worker, client environment needs to be set up.
 
 ### Build
 
-Following are the commands for building the unoptimized baseline code
+Following are the commands for building the code for both Coeus and the baseline baseline.
 To compile master code, run:
 
-    cd baseline/server/master
+    pushd baseline/server/master
     cmake .
     make
+	popd
+	pushd step1/server/master
+    cmake .
+    make
+	popd
+
 
 To compile worker code, run:
 
-    cd baseline/server/worker
+    pushd baseline/server/worker
     cmake .
     make
+	popd
+	pushd step1/server/worker
+	cmake .
+	make
+	popd
     
 To compile client code, run:
 
-    cd baseline/client
+    pushd baseline/client
     cmake .
     make
+	popd
+	pushd step1/client
+	cmake .
+	make
+	popd
 
 ### Run
 
@@ -177,19 +191,24 @@ Before running the experiments, it is required to synchronize the clocks of all 
     sudo timedatectl set-ntp off
     sudo timedatectl set-ntp on
     
-Then, in the master and worker machines, open the file <code>baseline/common/worker_ip.txt</code> and overwrite it with a list of ip addresses of the worker machines, each in a separate line. Then, run each process in the order mentioned below. The explanation of the options associated with each command are also included afterwards.
+Then, in the master and worker machines, replace the files <code>step1/common/worker_ip.txt</code> and <code>baseline/common/worker_ip.txt</code> with a list of ip addresses of the worker machines, each in a separate line. Then, run Coeus and baseline experiments independently as outlined below.run each process in the order mentioned below. The explanation of the options associated with each command are also included afterwards.
+
+#### Coeus
 
 Run master:
 
-    python run_master.py -n <num_docs> -p <master_ip> -f <num_features> -c <client_ip> -w <num_workers>
+	cd step1/server/master
+    python run_master_latency.py -n <num_docs> -p <master_ip> -f <num_features> -c <client_ip> -w <num_workers>
     
 Run client
 
-    python run_client.py -n <num_docs> -p <master_ip> -f <num_features> -c <client_ip> -w <num_workers>
+	cd step1/client
+    python run_client_latency.py -n <num_docs> -p <master_ip> -f <num_features> -c <client_ip> -w <num_workers>
     
 Run each worker:
 
-    python run_worker.py -n <num_docs> -p <master_ip> -f <num_features> -c <client_ip> -w <num_workers> -t <num_thread_per_worker> -i <worker_id>
+	cd step1/server/worker
+    python run_worker_latency.py -n <num_docs> -p <master_ip> -f <num_features> -c <client_ip> -w <num_workers> -t <num_thread_per_worker> -i <worker_id>
     
 The options are explained below:
 
@@ -201,6 +220,42 @@ The options are explained below:
     -t number of threads used by each worker process. If a single worker runs on a machine, the recommneded value is the number of cores in the machine. Otherwise, should be adjusted accordingly
     -i id of the worker where 0 <= i < number of worker processes. Id must be unique for each worker.
 
-### Comparing results
+The experiment needs to be repeated for different document library sizes. Each process will produce output files in its <code>result/</code> subdirectory.
 
-For both baseline and Coeus, the latency of step 1 can be found in the client output file generated in <code>client/reult/</code> directory. The latency numbers in line 4 of each file will provide a comparative overview of the two systems. The trend should follow the graph in Figure 5 of the paper.
+#### Baseline
+
+Run master:
+
+	cd baseline/server/master
+    python run_master_latency.py -n <num_docs> -p <master_ip> -f <num_features> -c <client_ip> -w <num_workers>
+    
+Run client
+
+	cd baseline/client
+    python run_client_latency.py -n <num_docs> -p <master_ip> -f <num_features> -c <client_ip> -w <num_workers>
+    
+Run each worker:
+
+	cd baseline/server/worker
+    python run_worker_latency.py -n <num_docs> -p <master_ip> -f <num_features> -c <client_ip> -w <num_workers> -t <num_thread_per_worker> -i <worker_id>
+    
+The options are explained below:
+
+    -n Number of documents
+    -p id address of the master machine
+    -f number of total features. Must be a multiple of 8192, otherwise will be padded up.
+    -c ip address of the client machine
+    -w number of worker processes (multiple worker processes can be deployed in a single machine, though not recommended).
+    -t number of threads used by each worker process. If a single worker runs on a machine, the recommneded value is the number of cores in the machine. Otherwise, should be adjusted accordingly
+    -i id of the worker where 0 <= i < number of worker processes. Id must be unique for each worker.
+
+The experiment needs to be repeated for different document library sizes. Each process will produce output files in its <code>result/</code> subdirectory.
+
+### Generate graph (Figure 5)
+
+After completion of the experiments, in the client machine, copy the files in <code>step1/client/result/</code> and <code>baseline/client/result/</code> into <code>graphs/latency-vs-machines/raw/</code>. To generate a graph like Figure 5, run:
+
+    cd graphs/latency-vs-machines
+    python gen_graph.py 
+
+The graph will be available in a file named <code>latency-vs-machines.pdf</code>

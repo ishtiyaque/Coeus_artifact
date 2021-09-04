@@ -2,28 +2,32 @@ import os, sys, getopt
 import numpy as np
 
 def main(argv):
+	num_docs = 0
+	num_features = 0
 	num_rows = 0
 	master_ip = ""
+	b = 0
 	num_cols = 0
 	client_ip = ""
+	executable = ""
 	factor = 0
 	num_group = 0
 	num_total_worker = 0
-	num_docs = 0
 	try:
 		opts, args = getopt.getopt(argv,"n:p:f:c:w:")
 	except getopt.GetoptError:
-		print("run_master.py -n <num_docs>  -p <master_ip> -f <num_features> -c <client_ip> -w <num_workers>")
+		print("run_master.py -n <num_docs> -p <master_ip> -f <num_features> -c <client_ip> -w <num_workers>")
 		sys.exit(2)
 	for opt, arg in opts:
 		if opt == '-n':
-			num_rows = int(np.ceil(int(arg) / (8192*3)))
 			num_docs = int(arg)
+			num_rows = int(np.ceil(int(arg) / (8192*3)))
 		elif opt == '-p':
 			master_ip = arg
 		elif opt == '-f':
 			num_cols = int(np.ceil(int(arg) / 8192))
-			factor = num_cols
+			num_features = num_cols * 8192
+
 		elif opt == '-c':
 			client_ip = arg
 		elif opt == '-w':
@@ -48,13 +52,32 @@ def main(argv):
 	if num_total_worker == 0:
 		print("missing -w")
 		sys.exit(2)
+	
+	quotient = num_features / num_total_worker
+	if quotient >= 8192:
+		executable = "merge"
+		factor = int(quotient/8192)
+	else:
+		executable = "split"
+		factor = int(8192/quotient)
 
-	num_group = num_total_worker
+		
+	if executable == "split":
+		if num_total_worker%(num_cols * factor) != 0:
+			print("Error: w must be a multiple of f / 2^b")
+			sys.exit(2)
+		num_group = int(num_total_worker / (num_cols * factor))
+	elif executable == "merge":
+		if num_total_worker%(num_cols / factor) != 0:
+			print("Error: w must be a multiple of f / 2^b")
+			sys.exit(2)
+		num_group = int(num_total_worker / (num_cols / factor))
+
 	num_worker_per_group = int(num_total_worker / num_group)
 	num_rows = int((np.ceil(num_rows/num_group) * num_group))
 
-	master_cmd = 'bin/master -r {} -s {} -p {} -w {} -g {} > result/master_n_{}.txt '
-	master_cmd = master_cmd.format(num_rows, factor, master_ip, num_worker_per_group, num_group, num_docs)
+	master_cmd = 'bin/{} -r {} -s {} -p {} -w {} -g {} > result/master_w_{}_n_{}_f_{}.txt '
+	master_cmd = master_cmd.format(executable, num_rows, factor, master_ip, num_worker_per_group, num_group, num_total_worker, num_docs, num_features)
 
 	#print(master_cmd)
 	os.system(master_cmd)

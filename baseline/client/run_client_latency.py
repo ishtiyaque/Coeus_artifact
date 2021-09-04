@@ -2,14 +2,16 @@ import os, sys, getopt
 import numpy as np
 
 def main(argv):
+	num_docs = 0
+	num_features = 0
 	num_rows = 0
 	master_ip = ""
 	num_cols = 0
 	client_ip = ""
+	executable = ""
 	factor = 0
 	num_group = 0
 	num_total_worker = 0
-	num_docs = 0
 	try:
 		opts, args = getopt.getopt(argv,"n:p:f:c:w:")
 	except getopt.GetoptError:
@@ -17,13 +19,13 @@ def main(argv):
 		sys.exit(2)
 	for opt, arg in opts:
 		if opt == '-n':
-			num_rows = int(np.ceil(int(arg) / (8192*3)))
 			num_docs = int(arg)
+			num_rows = int(np.ceil(int(arg) / (8192*3)))
 		elif opt == '-p':
 			master_ip = arg
 		elif opt == '-f':
 			num_cols = int(np.ceil(int(arg) / 8192))
-			factor = num_cols
+			num_features = num_cols * 8192
 		elif opt == '-c':
 			client_ip = arg
 		elif opt == '-w':
@@ -48,11 +50,15 @@ def main(argv):
 	if num_total_worker == 0:
 		print("missing -w")
 		sys.exit(2)
-		
-	num_group = num_total_worker
+
+	executable = "client"
+	factor = num_features / 8192
+	num_group = int(num_total_worker / (num_cols / factor))
+
+
 	num_rows = int((np.ceil(num_rows/num_group) * num_group))
-	client_cmd = 'bin/client -r {} -s {} -p {} -q {} -c {} -g {} > result/client_n_{}.txt '
-	client_cmd = client_cmd.format(num_rows, factor, master_ip, num_cols, client_ip, num_group, num_docs)
+	client_cmd = 'bin/{} -r {} -s {} -p {} -q {} -c {} -g {} > result/Baseline_client_w_{}_n_{}_f_{}.txt '
+	client_cmd = client_cmd.format(executable, num_rows, factor, master_ip, num_cols, client_ip, num_group, num_total_worker, num_docs, num_features)
 
 	#print(client_cmd)
 	os.system(client_cmd)
