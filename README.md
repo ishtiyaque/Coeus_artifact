@@ -198,17 +198,17 @@ Then, in the master and worker machines, replace the files <code>step1/common/wo
 Run master:
 
 	cd step1/server/master
-    python run_master_latency.py -n <num_docs> -p <master_ip> -f <num_features> -c <client_ip> -w <num_workers>
+	python run_master_latency.py -n <num_docs> -p <master_ip> -f <num_features> -c <client_ip> -w <num_workers>
     
 Run client
 
 	cd step1/client
-    python run_client_latency.py -n <num_docs> -p <master_ip> -f <num_features> -c <client_ip> -w <num_workers>
+	python run_client_latency.py -n <num_docs> -p <master_ip> -f <num_features> -c <client_ip> -w <num_workers>
     
 Run each worker:
 
 	cd step1/server/worker
-    python run_worker_latency.py -n <num_docs> -p <master_ip> -f <num_features> -c <client_ip> -w <num_workers> -t <num_thread_per_worker> -i <worker_id>
+	python run_worker_latency.py -n <num_docs> -p <master_ip> -f <num_features> -c <client_ip> -w <num_workers> -t <num_thread_per_worker> -i <worker_id>
     
 The options are explained below:
 
@@ -259,3 +259,163 @@ After completion of the experiments, in the client machine, copy the files in <c
     python gen_graph.py 
 
 The graph will be available in a file named <code>latency-vs-machines.pdf</code>
+
+## End-to-end performance of Coeus (Figure 6 and 7)
+
+The end-to-end pipeline of Coeus consists of 3 sequential steps. Figure 6 in the paper shows a latency breakdown of these three different steps for three different document library sizes. Figure 7 shows the client CPU and network costs for the same experiments. In order to reproduce these results, one first needs to pick three different document sizes and then execute each of step1, step2, and step3 of Coeus. All of the three steps require a similar master, worker, and client setup.
+
+### Step1
+
+#### Build
+
+To build master code, run:
+
+	cd step1/server/master
+	cmake .
+	make
+
+To build worker code, run:
+
+	cd step1/server/worker
+	cmake .
+	make
+    
+To build client code, run:
+
+	cd step1/client
+	cmake .
+	make
+
+#### Run
+
+First, in the master and worker machines, replace the files <code>step1/common/worker_ip.txt</code> with a list of ip addresses of the worker machines, each in a separate line. 
+
+Run master:
+
+	cd step1/server/master
+	python run_master_latency.py -n <num_docs> -p <master_ip> -f <num_features> -c <client_ip> -w <num_workers>
+    
+Run client
+
+	cd step1/client
+	python run_client_latency.py -n <num_docs> -p <master_ip> -f <num_features> -c <client_ip> -w <num_workers>
+    
+Run each worker:
+
+	cd step1/server/worker
+	python run_worker_latency.py -n <num_docs> -p <master_ip> -f <num_features> -c <client_ip> -w <num_workers> -t <num_thread_per_worker> -i <worker_id>
+    
+The options are explained below:
+
+    -n Number of documents
+    -p id address of the master machine
+    -f number of total features. Must be a multiple of 8192, otherwise will be padded up.
+    -c ip address of the client machine
+    -w number of worker processes (multiple worker processes can be deployed in a single machine, though not recommended).
+    -t number of threads used by each worker process. If a single worker runs on a machine, the recommneded value is the number of cores in the machine. Otherwise, should be adjusted accordingly
+    -i id of the worker where 0 <= i < number of worker processes. Id must be unique for each worker.
+
+The experiment needs to be repeated for different document library sizes. Each process will produce output files in its <code>result/</code> subdirectory.
+
+
+### Step2
+
+#### Build
+
+To build master code, run:
+
+	cd step2/master
+	cmake .
+	make
+
+To build worker code, run:
+
+	cd step2/worker
+	cmake .
+	make
+    
+To build client code, run:
+
+	cd step2/client
+	cmake .
+	make
+
+#### Run
+
+Step2 should be run with a fixed number of 24 worker processes. Multiple workers may run on a single machine. For our experiments, we used 6 worker machines to run the 24 processes. In the master and worker machines, the file <code>step2/common/worker_ip.txt</code> should be replaced with the 24 worker ip addresses (possibly with repetitions), each in a separate line.
+
+Run master:
+
+	cd step2/master
+	python run_master_latency.py -n <num_docs> -p <master_ip> 
+    
+Run client
+
+	cd step2/client
+	python run_client_latency.py -n <num_docs> -p <master_ip>  -c <client_ip>
+    
+Run each worker:
+
+	cd step2/worker
+	python run_worker_latency.py -n <num_docs> -c <client_ip>  -i <worker_id>
+    
+The options are explained below:
+
+    -n Number of documents
+    -p id address of the master machine
+    -c ip address of the client machine
+    -i id of the worker where 0 <= i < 24. Id must be unique for each worker.
+
+The experiment needs to be repeated for different document library sizes. Each process will produce output files in its <code>result/</code> subdirectory.
+
+### Step3
+
+#### Build
+
+To build master code, run:
+
+	cd step3/master
+	cmake .
+	make
+
+To build worker code, run:
+
+	cd step3/worker
+	cmake .
+	make
+    
+To build client code, run:
+
+	cd step3/client
+	cmake .
+	make
+
+#### Run
+
+Step3 should be run with a fixed number of 38 worker processes. Multiple workers may run on a single machine, though not recommended. In the master and worker machines, the file <code>step3/common/worker_ip.txt</code> should be replaced with the 38 worker ip addresses (possibly with repetitions), each in a separate line.
+
+Run master:
+
+	cd step3/master
+	python run_master_latency.py -n <num_docs> -p <master_ip> 
+    
+Run client
+
+	cd step3/client
+	python run_client_latency.py -n <num_docs> -p <master_ip>  -c <client_ip>
+    
+Run each worker:
+
+	cd step2/worker
+	python run_worker_latency.py -n <num_docs> -c <client_ip>  -i <worker_id>
+    
+The options are explained below:
+
+    -n Number of documents
+    -p id address of the master machine
+    -c ip address of the client machine
+    -i id of the worker where 0 <= i < 38. Id must be unique for each worker.
+    
+The experiment needs to be repeated for different document library sizes. Each process will produce output files in its <code>result/</code> subdirectory.
+
+### Generate graphs (Figure 6 and 7)
