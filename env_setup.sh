@@ -35,4 +35,11 @@ make
 sudo make install
 popd
 
+git clone https://github.com/rpclib/rpclib.git
+pushd rpclib
+cmake .
+make
+sudo make install
+popd
+
 popd
