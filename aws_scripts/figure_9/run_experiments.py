@@ -109,8 +109,41 @@ for split_factor in split_factor_arr:
 	b = int(np.log2(POLY_MODULUS_DEGREE / split_factor))
 	num_group = int(num_total_worker / (num_query * split_factor))
 	num_worker_per_group = int(num_total_worker / num_group)
+	dir_name = "result/b_{}/".format(b)
+	os.system('mkdir -p '+dir_name)
+	client_filename = dir_name+"client.txt"
+	master_filename = dir_name+"master.txt"
+	
+	if (os.path.exists(client_filename)) and (os.path.exists(master_filename)):
+		skip = True
+		client_file = open(client_filename)
+		client_output = client_file.readlines()
+		if len(client_output) != 20:
+			skip = False
+		client_file.close()
 
-
+		master_file = open(master_filename)
+		master_output = master_file.readlines()
+		if len(master_output) != 8:
+			skip = False
+		master_file.close()
+		
+		if (skip == True):
+			for i in range(num_total_worker):
+				worker_filename = dir_name+"worker_{}.txt".format(i)
+				if (os.path.exists(worker_filename)):
+					worker_file = open(worker_filename)
+					worker_output = worker_file.readlines()
+					if len(worker_output) != 18:
+						skip = False
+					worker_file.close()
+				else:
+					skip = False
+					
+		if (skip == True):
+			print("finished width = 2^{} "+str(b)+ "\tskipped" )
+			continue
+	
 	worker_cmd = 'bin/split -w {} -s {} -t {} -c {} -r {} -g {} -i '
 	worker_cmd = worker_cmd.format(num_worker_per_group, split_factor, num_thread_per_worker,client_private_ip, int(num_response/num_group), num_group)
 	master_cmd = 'bin/split -r {} -s {} -p {} -w {} -g {} '
@@ -118,43 +151,40 @@ for split_factor in split_factor_arr:
 	client_cmd = 'bin/split -r {} -s {} -p {} -q {} -c {} -g {}'
 	client_cmd = client_cmd.format(num_response, split_factor, master_private_ip, num_query, client_private_ip, num_group)
 
-	for itr in range(0,num_iter):
-		dir_name = "result/b_{}/".format(b)
-		os.system('mkdir -p '+dir_name)
-		win = []
-		wout = []
-		werr = []
-		mtin, mtout, mterr=master_connection.exec_command('ulimit -n 4096; cd ~/Coeus_artifact/step1/server/master;'+master_cmd)
-		time.sleep(3)
-		clin, clout, clerr=client_connection.exec_command('ulimit -n 4096; cd ~/Coeus_artifact/step1/client;'+client_cmd)
-		time.sleep(3)
-		for i in range(num_total_worker):
-			_win, _wout, _werr=worker_connections[i].exec_command('ulimit -n 4096; cd ~/Coeus_artifact/step1/server/worker;'+worker_cmd+str(i))
-			win.append(_win)
-			wout.append(_wout)
-			werr.append(_werr)
-		time.sleep(30)
-		client_output = clout.readlines()
-		master_output = mtout.readlines()
-		worker_output = []
-		for _wout in wout:
-			worker_output.append(_wout.readlines())
+	win = []
+	wout = []
+	werr = []
+	mtin, mtout, mterr=master_connection.exec_command('ulimit -n 4096; cd ~/Coeus_artifact/step1/server/master;'+master_cmd)
+	time.sleep(3)
+	clin, clout, clerr=client_connection.exec_command('ulimit -n 4096; cd ~/Coeus_artifact/step1/client;'+client_cmd)
+	time.sleep(3)
+	for i in range(num_total_worker):
+		_win, _wout, _werr=worker_connections[i].exec_command('ulimit -n 4096; cd ~/Coeus_artifact/step1/server/worker;'+worker_cmd+str(i))
+		win.append(_win)
+		wout.append(_wout)
+		werr.append(_werr)
+	time.sleep(30)
+	client_output = clout.readlines()
+	master_output = mtout.readlines()
+	worker_output = []
+	for _wout in wout:
+		worker_output.append(_wout.readlines())
 
-		client_file = open(dir_name+"client.txt", "w")
-		for line in client_output:
-			client_file.write(line)
-		client_file.close()
+	client_file = open(client_filename, "w")
+	for line in client_output:
+		client_file.write(line)
+	client_file.close()
 
-		master_file = open(dir_name+"master.txt", "w")
-		for line in master_output:
-			master_file.write(line)
-		master_file.close()
+	master_file = open(master_filename, "w")
+	for line in master_output:
+		master_file.write(line)
+	master_file.close()
 
-		for i in range(len(worker_output)):
-			worker_file = open(dir_name+"worker_"+str(i)+".txt", "w")
-			for line in worker_output[i]:
-				worker_file.write(line)
-			worker_file.close()
+	for i in range(len(worker_output)):
+		worker_file = open(dir_name+"worker_"+str(i)+".txt", "w")
+		for line in worker_output[i]:
+			worker_file.write(line)
+		worker_file.close()
 
 	print("finished width = 2^{} "+str(b)+ "\t" + datetime.datetime.now().strftime("%H:%M:%S"))
 
@@ -163,6 +193,41 @@ for scale_factor in scale_factor_arr:
 	b = int(np.log2(POLY_MODULUS_DEGREE * scale_factor))
 	num_group = int(num_total_worker / (num_query / scale_factor))
 	num_worker_per_group = int(num_total_worker / num_group)
+	dir_name = "result/b_{}/".format(b)
+	os.system('mkdir -p '+dir_name)
+
+	client_filename = dir_name+"client.txt"
+	master_filename = dir_name+"master.txt"
+	
+	if (os.path.exists(client_filename)) and (os.path.exists(master_filename)):
+		skip = True
+		client_file = open(client_filename)
+		client_output = client_file.readlines()
+		if len(client_output) != 16:
+			skip = False
+		client_file.close()
+
+		master_file = open(master_filename)
+		master_output = master_file.readlines()
+		if len(master_output) != 8:
+			skip = False
+		master_file.close()
+		
+		if (skip == True):
+			for i in range(num_total_worker):
+				worker_filename = dir_name+"worker_{}.txt".format(i)
+				if (os.path.exists(worker_filename)):
+					worker_file = open(worker_filename)
+					worker_output = worker_file.readlines()
+					if len(worker_output) != 18:
+						skip = False
+					worker_file.close()
+				else:
+					skip = False
+					
+		if (skip == True):
+			print("finished width = 2^{} "+str(b)+ "\tskipped" )
+			continue
 
 	worker_cmd = 'bin/merge -w {} -s {} -t {} -c {} -r {} -g {} -i '
 	worker_cmd = worker_cmd.format(num_worker_per_group, scale_factor, num_thread_per_worker,client_private_ip, int(num_response/num_group), num_group)
@@ -171,43 +236,40 @@ for scale_factor in scale_factor_arr:
 	client_cmd = 'bin/merge -r {} -s {} -p {} -q {} -c {} -g {}'
 	client_cmd = client_cmd.format(num_response, scale_factor, master_private_ip, num_query, client_private_ip, num_group)
 	
-	for itr in range(0,num_iter):
-		dir_name = "result/b_{}/".format(b)
-		os.system('mkdir -p '+dir_name)
-		win = []
-		wout = []
-		werr = []
-		mtin, mtout, mterr=master_connection.exec_command('ulimit -n 4096; cd ~/Coeus_artifact/step1/server/master;'+master_cmd)
-		time.sleep(3)
-		clin, clout, clerr=client_connection.exec_command('ulimit -n 4096; cd ~/Coeus_artifact/step1/client;'+client_cmd)
-		time.sleep(3)
-		for i in range(num_total_worker):
-			_win, _wout, _werr=worker_connections[i].exec_command('ulimit -n 4096; cd ~/Coeus_artifact/step1/server/worker;'+worker_cmd+str(i))
-			win.append(_win)
-			wout.append(_wout)
-			werr.append(_werr)
-		time.sleep(30)
-		client_output = clout.readlines()
-		master_output = mtout.readlines()
-		worker_output = []
-		for _wout in wout:
-			worker_output.append(_wout.readlines())
+	win = []
+	wout = []
+	werr = []
+	mtin, mtout, mterr=master_connection.exec_command('ulimit -n 4096; cd ~/Coeus_artifact/step1/server/master;'+master_cmd)
+	time.sleep(3)
+	clin, clout, clerr=client_connection.exec_command('ulimit -n 4096; cd ~/Coeus_artifact/step1/client;'+client_cmd)
+	time.sleep(3)
+	for i in range(num_total_worker):
+		_win, _wout, _werr=worker_connections[i].exec_command('ulimit -n 4096; cd ~/Coeus_artifact/step1/server/worker;'+worker_cmd+str(i))
+		win.append(_win)
+		wout.append(_wout)
+		werr.append(_werr)
+	time.sleep(30)
+	client_output = clout.readlines()
+	master_output = mtout.readlines()
+	worker_output = []
+	for _wout in wout:
+		worker_output.append(_wout.readlines())
 
-		client_file = open(dir_name+"client.txt", "w")
-		for line in client_output:
-			client_file.write(line)
-		client_file.close()
+	client_file = open(client_filename, "w")
+	for line in client_output:
+		client_file.write(line)
+	client_file.close()
 
-		master_file = open(dir_name+"master.txt", "w")
-		for line in master_output:
-			master_file.write(line)
-		master_file.close()
+	master_file = open(master_filename, "w")
+	for line in master_output:
+		master_file.write(line)
+	master_file.close()
 
-		for i in range(len(worker_output)):
-			worker_file = open(dir_name+"worker_"+str(i)+".txt", "w")
-			for line in worker_output[i]:
-				worker_file.write(line)
-			worker_file.close()
+	for i in range(len(worker_output)):
+		worker_file = open(dir_name+"worker_"+str(i)+".txt", "w")
+		for line in worker_output[i]:
+			worker_file.write(line)
+		worker_file.close()
 
 	print("finished width = 2^"+str(b)+ "\t" + datetime.datetime.now().strftime("%H:%M:%S"))
 
