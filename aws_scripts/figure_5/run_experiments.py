@@ -178,7 +178,7 @@ for elem in coeus_mapping:
 		win.append(_win)
 		wout.append(_wout)
 		werr.append(_werr)
-	time.sleep(30)
+	time.sleep(3)
 	client_output = clout.readlines()
 	master_output = mtout.readlines()
 	worker_output = []
@@ -285,7 +285,7 @@ for elem in baseline_mapping:
 		win.append(_win)
 		wout.append(_wout)
 		werr.append(_werr)
-	time.sleep(30)
+	time.sleep(3)
 	client_output = clout.readlines()
 	master_output = mtout.readlines()
 	worker_output = []

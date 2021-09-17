@@ -163,7 +163,7 @@ for split_factor in split_factor_arr:
 		win.append(_win)
 		wout.append(_wout)
 		werr.append(_werr)
-	time.sleep(30)
+	time.sleep(3)
 	client_output = clout.readlines()
 	master_output = mtout.readlines()
 	worker_output = []
@@ -248,7 +248,7 @@ for scale_factor in scale_factor_arr:
 		win.append(_win)
 		wout.append(_wout)
 		werr.append(_werr)
-	time.sleep(30)
+	time.sleep(3)
 	client_output = clout.readlines()
 	master_output = mtout.readlines()
 	worker_output = []

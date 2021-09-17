@@ -172,9 +172,9 @@ for elem in num_elements_arr:
 	wout = []
 	werr = []
 	mtin, mtout, mterr=master_connection.exec_command('ulimit -n 4096; cd ~/Coeus_artifact/step2/master;'+master_cmd)
-	time.sleep(1)
+	time.sleep(3)
 	clin, clout, clerr=client_connection.exec_command('ulimit -n 4096; cd ~/Coeus_artifact/step2/client;'+client_cmd)
-	time.sleep(1)
+	time.sleep(3)
 	for i in range(num_worker_machine):
 		for j in range(worker_per_machine):
 			wid = ((i*worker_per_machine)+j)
@@ -183,7 +183,7 @@ for elem in num_elements_arr:
 			win.append(_win)
 			wout.append(_wout)
 			werr.append(_werr)
-	time.sleep(15)
+	time.sleep(3)
 	worker_output = []
 	for _wout in wout:
 		worker_output.append(_wout.readlines())
@@ -343,7 +343,7 @@ for elem in num_elements_arr:
 		win.append(_win)
 		wout.append(_wout)
 		werr.append(_werr)
-	time.sleep(15)
+	time.sleep(3)
 	client_output = clout.readlines()
 	master_output = mtout.readlines()
 	worker_output = []
