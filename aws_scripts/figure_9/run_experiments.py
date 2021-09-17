@@ -141,7 +141,7 @@ for split_factor in split_factor_arr:
 					skip = False
 					
 		if (skip == True):
-			print("finished width = 2^{} "+str(b)+ "\tskipped" )
+			print("finished width = 2^"+str(b)+ "\tskipped" )
 			continue
 	
 	worker_cmd = 'bin/split -w {} -s {} -t {} -c {} -r {} -g {} -i '
@@ -186,7 +186,7 @@ for split_factor in split_factor_arr:
 			worker_file.write(line)
 		worker_file.close()
 
-	print("finished width = 2^{} "+str(b)+ "\t" + datetime.datetime.now().strftime("%H:%M:%S"))
+	print("finished width = 2^"+str(b)+ "\t" + datetime.datetime.now().strftime("%H:%M:%S"))
 
 
 for scale_factor in scale_factor_arr:
@@ -226,7 +226,7 @@ for scale_factor in scale_factor_arr:
 					skip = False
 					
 		if (skip == True):
-			print("finished width = 2^{} "+str(b)+ "\tskipped" )
+			print("finished width = 2^"+str(b)+ "\tskipped" )
 			continue
 
 	worker_cmd = 'bin/merge -w {} -s {} -t {} -c {} -r {} -g {} -i '
