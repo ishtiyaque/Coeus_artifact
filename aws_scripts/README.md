@@ -16,4 +16,6 @@ In each of the directories, two Python files need to be run. First, run <code>py
 
 Each experiment will put progress logs in the standard output along with timestamps. Sometimes a running script may hang due to disruption in network, internal errors in AWS, etc. As a rule of thumb, if there is no progress in 5 minutes, the script may be considered to be non-responsive. If that occurs, first terminate the running Python script. Then run the python script <code>Coeus_artifact/aws_scripts/kill_all.py</code>. This will take a while and kill all stray processes in the instances. This step is necessary because otherwise stray processes may keep occupying resources such as network ports, memory etc. After the script <code>kill_all.py</code> finishes successfully, re-run the interrupted experiment. it will resume from the point of interruption.
 
+## Clean up
 
+After finishing experiments, please go to <code>Coeus_artifact/aws_scripts/</code> and run <code>python shut_down.py</code>. This will shut down the running AWS instances.
